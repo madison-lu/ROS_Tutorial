@@ -1147,7 +1147,7 @@ This section goes through configuring the OS by flashing the microSD card with U
   ```
 - You should see both phy#1 and phy#0
   ```
-   sudo nmcli dev wifi connect "GL-MT3000-0a9" password "boats0519" ifname wlxe84e06fa5343
+   sudo nmcli dev wifi connect "GL-MT3000-0a9" password "boats0519" ifname wlx<your-specific-interface-id>
   
   ```
 6. To autoconnect to adpater on boot
