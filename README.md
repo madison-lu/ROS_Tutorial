@@ -1084,7 +1084,9 @@ This section goes through configuring the OS by flashing the microSD card with U
   3. Set the username to `tugxx`, with `xx` be you team number. If you are team 5, it will be `tug05`. Please set the password to `boats0519`.
   4. To give the tug a static IP address, we need to be talking to a travel router that talks to GTother (for example). We have router GLiNet AX3000 in lab. So basically, `GTother` (if you needs internet) -> `Router` -> both your laptop and tug is connected to `Router` -> can `ssh`
   - This means connect your Pi via ethernet to the GLiNet router.
-  5. Set a static ip to connect to router on boot
+  5. Set a static ip to connect to router on boot.
+    Run the following command to edit your Pi's network plan
+    
     `sudo nano /etc/netplan/01-network-manager-all.yaml`
     
     ```yaml
@@ -1101,13 +1103,16 @@ This section goes through configuring the OS by flashing the microSD card with U
               via: 192.168.2.5
           nameservers:
             addresses: [8.8.8.8, 1.1.1.1]
+          access-points:
+            "GL-MT3000-0a9":    
+              password: "boats0519"
     ```
   6. The router is set up for you already. Connect to wifi on your laptop: `GL-MT3000-0a9`  OR  `GL-MT3000-0a9-5G`
   - Password: `boats0519`
-  6. Admin password for logging in from the web (DNS should be the correct IP): `@boats0519`
-  7. If steps 4-6 are too much for you right now - just connect to gtother following this website: [https://auth.lawn.gatech.edu/key/](url)
-  8. Type `ifconfig` in the terminal and note the IP address.
-  9. To enable SSH on the Pi, enter the following in the terminal:
+  7. Admin password for logging in from the web (DNS should be the correct IP): `@boats0519`
+  8. If steps 4-6 are too much for you right now - just connect to gtother following this website: [https://auth.lawn.gatech.edu/key/](url)
+  9. Type `ip a` in the terminal and note the IP address.
+  10. To enable SSH on the Pi, enter the following in the terminal:
       ```
         sudo apt update
         sudo apt install raspi-config
