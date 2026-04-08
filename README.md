@@ -1082,8 +1082,26 @@ This section goes through configuring the OS by flashing the microSD card with U
   1. Follow the instructions from the following link to flash Ubuntu 22.04 onto the microSD card: [https://ubuntu.com/download/raspberry-pi](url). Follow the `Desktop` tutorial. You need your laptop to do this.
   2. Insert the flashed microSD card into the Raspberry Pi and connect the Pi to a monitor, keyboard, and mouse. Power the Pi, and the monitor will turn on automatically. 
   3. Set the username to `tugxx`, with `xx` be you team number. If you are team 5, it will be `tug05`. Please set the password to `boats0519`.
-  4. To give the tug a static IP address, we need to be talking to a travel router that talks to GTother (for example). We have router GLiNet AX3000 in lab. So basically, `GTother` (if you needs internet) -> `Router` -> both your laptop and tug is connected to `Rourouter ter` -> can `ssh`
+  4. To give the tug a static IP address, we need to be talking to a travel router that talks to GTother (for example). We have router GLiNet AX3000 in lab. So basically, `GTother` (if you needs internet) -> `Router` -> both your laptop and tug is connected to `Router` -> can `ssh`
   - This means connect your Pi via ethernet to the GLiNet router.
+  5. Set a static ip to connect to router on boot
+    `sudo nano /etc/netplan/01-network-manager-all.yaml`
+    
+    ```yaml
+    network:
+      version: 2
+      renderer: NetworkManager
+      ethernets:
+        eth0:
+          dhcp4: no
+          addresses:
+            - 192.168.2.213/24
+          routes:
+            - to: default
+              via: 192.168.2.5
+          nameservers:
+            addresses: [8.8.8.8, 1.1.1.1]
+    ```
   6. The router is set up for you already. Connect to wifi on your laptop: `GL-MT3000-0a9`  OR  `GL-MT3000-0a9-5G`
   - Password: `boats0519`
   6. Admin password for logging in from the web (DNS should be the correct IP): `@boats0519`
