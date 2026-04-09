@@ -1263,7 +1263,7 @@ Camera communicates with the Pi via USB. Check which port the camera is sending 
 Topic name: `/stinger/camera_0/image_raw`
 
 Node name: `camera-node`
-- `sudo v412-ctl --list-devices` - check which channel the image is coming in, typically is 0
+- `sudo v4l2-ctl --list-devices` - check which channel the image is coming in, typically is 0
 - `sudo chmod 666 /dev/video0` - to allow permission. Assuming video0 is the camera stream, if not, remember to change to correct channel.
 - `rqt` - visualize it in ROS2 (make sure the node is running)
 
