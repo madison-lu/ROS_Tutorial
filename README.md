@@ -1084,35 +1084,12 @@ This section goes through configuring the OS by flashing the microSD card with U
   3. Set the username to `tugxx`, with `xx` be you team number. If you are team 5, it will be `tug05`. Please set the password to `boats0519`.
   4. To give the tug a static IP address, we need to be talking to a travel router that talks to GTother (for example). We have router GLiNet AX3000 in lab. So basically, `GTother` (if you needs internet) -> `Router` -> both your laptop and tug is connected to `Router` -> can `ssh`
   - This means connect your Pi via ethernet to the GLiNet router.
-  5. Set a static ip to connect to router on boot. Use the ip 192.168.2.2xx where xx is your team number.
-    Run the following command to edit your Pi's network plan
-    
-    `sudo nano /etc/netplan/01-network-manager-all.yaml`
-    
-    ```yaml
-    network:
-      version: 2
-      renderer: NetworkManager
-      ethernets:
-        eth0:
-          dhcp4: no
-          addresses:
-            - 192.168.2.2<your team number>/24
-          routes:
-            - to: default
-              via: 192.168.2.5
-          nameservers:
-            addresses: [8.8.8.8, 1.1.1.1]
-          access-points:
-            "GL-MT3000-0a9":    
-              password: "boats0519"
-    ```
-  6. The router is set up for you already. Connect to wifi on your laptop: `GL-MT3000-0a9`  OR  `GL-MT3000-0a9-5G`
+  5.  The router is set up for you already. Connect to wifi on your laptop: `GL-MT3000-0a9`  OR  `GL-MT3000-0a9-5G`
   - Password: `boats0519`
-  7. Admin password for logging in from the web (DNS should be the correct IP): `@boats0519`
-  8. If steps 4-6 are too much for you right now - just connect to gtother following this website: [https://auth.lawn.gatech.edu/key/](url)
-  9. Type `ip a` in the terminal and note the IP address.
-  10. To enable SSH on the Pi, enter the following in the terminal:
+  6. Admin password for logging in from the web (DNS should be the correct IP): `@boats0519`
+  7. If steps 4-6 are too much for you right now - just connect to gtother following this website: [https://auth.lawn.gatech.edu/key/](url)
+  8. Type `ip a` in the terminal and note the IP address.
+  9. To enable SSH on the Pi, enter the following in the terminal:
       ```
         sudo apt update
         sudo apt install raspi-config
@@ -1129,33 +1106,54 @@ This section goes through configuring the OS by flashing the microSD card with U
   3. You should have installed `colcon` if you followed till the end of the tutorial. One more thing: `sudo apt install build-essential`
 
 
-#### 8.1 c Installing Wifi Adapter
+#### 8.1 c Installing Wifi Adapter & Setting Static IP
 1. Installing the adapter
 - Requirements: Pi is powered off; You have USB->SMA adapter; SMA-SMA cable and SMA wifi antenna
 - Plug in all components with the Pi powered off
 2. Power your Pi on
 3. Connect your Pi to the GLinet router via ethernet and your laptop connected via wifi to 'GL-MT3000-0a9' or 'GL-MT3000-0a9-5G'
 4. ssh into your Pi
-5. Enter the following into the terminal:
-  ```
+5. Install the Wi-Fi adapter drivers by entering the following into the terminal:
+  ```bash
     cd ~
-    git clone https://github.com/morrownr/8821cu-20210916.git
+    git clone [https://github.com/morrownr/8821cu-20210916.git](https://github.com/morrownr/8821cu-20210916.git)
     cd 8821cu-20210916
     sudo ./install-driver.sh
     sudo reboot
-    iw dev
   ```
-- You should see both phy#1 and phy#0
+6. SSH back into your Pi after the reboot. Find your specific Wi-Fi interface name (it will start with `wlx...`) by running:
+  ```bash
+    ip a
   ```
-   sudo nmcli dev wifi connect "GL-MT3000-0a9" password "boats0519" ifname wlx<your-specific-interface-id>
-  
+7. Set a static IP to connect to the router on boot automatically. Use the IP `192.168.2.2xx` where `xx` is your team number. Run the following command to edit your Pi's network plan:
+  ```bash
+    sudo nano /etc/netplan/01-network-manager-all.yaml
   ```
-6. To autoconnect to adpater on boot
-    ```
-
-     sudo nmcli connection add type wifi ifname wlx<your-specific-interface-id> con-name glinet-ap ssid "GL-MT3000-0a9"
-     sudo nmcli connection modify glinet-ap wifi-sec.key-mgmt wpa-psk wifi-sec.psk "boats0519"
-     sudo nmcli connection up glinet-ap
+8. Replace the file's contents with the following configuration. (Make sure to replace `<your-specific-interface-id>` and `<your team number>`):
+  ```yaml
+  network:
+    version: 2
+    renderer: NetworkManager
+    wifis:
+      wlx<your-specific-interface-id>:
+        dhcp4: no
+        addresses:
+          - 192.168.2.2<your team number>/24
+        routes:
+          - to: default
+            via: 192.168.2.5
+        nameservers:
+          addresses: [8.8.8.8, 1.1.1.1]
+        access-points:
+          "GL-MT3000-0a9":    
+            password: "boats0519"
+  ```
+9. Save and exit (`Ctrl + O`, `Enter`, `Ctrl + X`). Then, secure the file permissions and apply the network plan:
+  ```bash
+    sudo chmod 600 /etc/netplan/01-network-manager-all.yaml
+    sudo netplan apply
+  ```
+<hr>
 
     
 <hr>
