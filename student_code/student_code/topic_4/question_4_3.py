@@ -106,7 +106,12 @@ class TutorialTopic_4_3(Node):
 
         # TODO: 4.3.a Odom Frame IMU
         ### STUDENT CODE HERE
+        q = msg_base_link.orientation
+        q_tf = [q.x, q.y, q.z, q.w]
+        rot_matrix = tf_transformations.quaternion_matrix(q_tf)[:3, :3]
 
+        lin_acc_odom = self.rotate_vector(rot_matrix, msg_base_link.linear_acceleration)
+        ang_vel_odom = self.rotate_vector(rot_matrix, msg_base_link.angular_velocity)
         ### END STUDENT CODE
 
 
@@ -114,7 +119,40 @@ class TutorialTopic_4_3(Node):
         odom_msg.header.stamp = msg.header.stamp
         # TODO: 4.3.b IMU Dead Reckoning
         ### STUDENT CODE HERE
+        # tine dif since last imu read
+        current_time = self.get_clock().now()
+        dt = (current_time - self.prev_time).nanoseconds / 1e9
+        self.prev_time = current_time
 
+        # int acc for v
+        self.velocity[0] += lin_acc_odom[0] * dt
+        self.velocity[1] += lin_acc_odom[1] * dt
+
+        # int v for p
+        self.position[0] += self.velocity[0] * dt
+        self.position[1] += self.velocity[1] * dt
+
+        # odom msg
+        odom_msg.header.frame_id = 'odom'
+        odom_msg.child_frame_id = 'base_link'
+
+        # position
+        odom_msg.pose.pose.position.x = self.position[0]
+        odom_msg.pose.pose.position.y = self.position[1]
+        odom_msg.pose.pose.position.z = 0.0
+
+        # orientaiton
+        odom_msg.pose.pose.orientation = msg_base_link.orientation
+
+        # twist
+        odom_msg.twist.twist.linear.x = self.velocity[0]
+        odom_msg.twist.twist.linear.y = self.velocity[1]
+        odom_msg.twist.twist.linear.z = 0.0
+        odom_msg.twist.twist.angular.x = ang_vel_odom[0]
+        odom_msg.twist.twist.angular.y = ang_vel_odom[1]
+        odom_msg.twist.twist.angular.z = ang_vel_odom[2]
+
+        self.odom_pub.publish(odom_msg)
         ### END STUDENT CODE
 
 def main(args=None):
